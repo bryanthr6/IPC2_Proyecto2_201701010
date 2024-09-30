@@ -1,3 +1,6 @@
+import re  # Usaremos expresiones regulares
+from lista_posicion import Lista_Posicion  # Importar la nueva clase para las posiciones
+
 def calcular_tiempo_ensamblaje(maquina):
     print("Seleccione un producto para calcular el tiempo de ensamblaje:")
     
@@ -31,16 +34,28 @@ def calcular_tiempo_ensamblaje(maquina):
     producto = actual_producto.producto
     instrucciones = producto.elaboracion.split()  # Asumiendo que las instrucciones están separadas por espacios
     tiempo_total = 0
+    posiciones = Lista_Posicion()  # Crear la lista enlazada para las posiciones de los brazos
 
     # Procesar cada instrucción
     for instruccion in instrucciones:
-        # Obtener la línea y componente de la instrucción (e.g., L1C2)
-        linea = int(instruccion[1])  # Obtener el número de línea
-        componente = int(instruccion[3])  # Obtener el número de componente
+        # Usar expresión regular para extraer los números de línea y componente
+        match = re.match(r'L(\d+)C(\d+)', instruccion)
+        if not match:
+            print(f"ERROR: Instrucción no válida '{instruccion}'")
+            continue
 
-        # Calcular el tiempo para mover el brazo y ensamblar el componente
-        tiempo_mover_brazo = componente  # Tarda `componente` segundos en moverse
+        linea = int(match.group(1))  # Obtener el número de línea
+        componente = int(match.group(2))  # Obtener el número de componente
+
+        # Obtener la posición actual del brazo en esta línea
+        posicion_anterior = posiciones.obtener_posicion(linea)
+
+        # Calcular el tiempo para mover el brazo
+        tiempo_mover_brazo = abs(componente - posicion_anterior)  # El brazo tarda en moverse la diferencia de componentes
         tiempo_ensamblar = maquina.tiempo_ensamblaje  # Tiempo de ensamblaje por componente
+
+        # Actualizar la posición del brazo en esta línea
+        posiciones.insertar_o_actualizar(linea, componente)
 
         print(f"Moviendo brazo a la línea {linea}, componente {componente}... (Tarda {tiempo_mover_brazo} segundos)")
         tiempo_total += tiempo_mover_brazo
