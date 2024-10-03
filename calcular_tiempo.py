@@ -1,3 +1,4 @@
+#calcular_tiempo.py
 import re  # Usaremos expresiones regulares
 from lista_posicion import Lista_Posicion  # Importar la nueva clase para las posiciones
 

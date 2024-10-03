@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPC2_Proyecto2</title>
+    <title>{{ data.title }}</title>
 </head>
 <body>
-    <h1>Muy buenas noches :v</h1>
+    <h1>{{ data.content }}</h1>
+    
+    <!-- Formulario para cargar el archivo XML -->
+    <form method="POST" enctype="multipart/form-data">
+        <label for="archivo">Cargar archivo XML:</label>
+        <input type="file" name="archivo" id="archivo" accept=".xml" required>
+        <button type="submit">Cargar</button>
+    </form>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Combobox para seleccionar la máquina, solo se muestra si hay un mensaje de éxito -->
+    {% if 'Archivo cargado exitosamente' in get_flashed_messages() %}
+        <h2>Seleccionar máquina</h2>
+        <form method="POST" action="/seleccionar-maquina">
+            <label for="maquina">Máquinas disponibles:</label>
+            <select name="maquina" id="maquina">
+                <option value="" disabled selected>Seleccione una máquina</option>
+                <!-- Aquí se puede llenar con máquinas después -->
+            </select>
+            <button type="submit">Seleccionar</button>
+        </form>
+    {% endif %}
 </body>
 </html>

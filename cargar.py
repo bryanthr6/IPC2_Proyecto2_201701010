@@ -1,4 +1,4 @@
-# cargar.py
+#cargar.py
 import xml.etree.ElementTree as ET
 import re
 from lista_maquinas import Lista_Maquinas
@@ -6,12 +6,14 @@ from lista_productos import Lista_Productos
 from maquina import Maquina
 from producto import Producto
 
-def cargar_archivo(ruta):
+def cargar_archivo(ruta, lista_maquinas=None):
     try:
+        # Si no hay una lista de máquinas existente, crear una nueva
+        if lista_maquinas is None:
+            lista_maquinas = Lista_Maquinas()
+
         tree = ET.parse(ruta)
         root = tree.getroot()
-        
-        lista_maquinas = Lista_Maquinas()
         
         # Iterar sobre las máquinas en el archivo XML
         for maquina_xml in root.findall('Maquina'):

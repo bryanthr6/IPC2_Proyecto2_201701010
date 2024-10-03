@@ -2,6 +2,7 @@
 from cargar import cargar_archivo  # Importar la función cargar_archivo desde cargar.py
 from calcular_tiempo import calcular_tiempo_ensamblaje
 
+
 def main():
     opcion = 0
     lista_maquinas = None  # Inicializar la variable para almacenar las máquinas cargadas
@@ -24,7 +25,8 @@ def main():
         match opcion:
             case 1:
                 ruta = input("Ingrese la ruta del archivo XML: ")
-                lista_maquinas = cargar_archivo(ruta)  # Cargar el archivo usando la función en cargar.py
+                # Acumular las máquinas cargadas
+                lista_maquinas = cargar_archivo(ruta, lista_maquinas)
             case 2:
                 if lista_maquinas:
                     lista_maquinas.imprimir()  # Asumiendo que Lista_Maquinas tiene un método imprimir implementado

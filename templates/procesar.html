@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesar Archivo</title>
+</head>
+<body>
+    <h1>Máquinas Cargadas</h1>
+    <ul>
+        {% set actual_maquina = lista_maquinas.primero %}
+        {% set contador = 1 %}
+        {% while actual_maquina %}
+        <li>
+            {{ actual_maquina.maquina.nombre }} (Líneas: {{ actual_maquina.maquina.lineas }}, Componentes: {{ actual_maquina.maquina.componentes }}, Tiempo de ensamblaje: {{ actual_maquina.maquina.tiempo_ensamblaje }} segundos)
+            <a href="{{ url_for('resultado', maquina_id=contador) }}">Ver productos</a>
+        </li>
+        {% set actual_maquina = actual_maquina.siguiente %}
+        {% set contador = contador + 1 %}
+        {% endwhile %}
+    </ul>
+</body>
+</html>

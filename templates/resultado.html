@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos de la Máquina</title>
+</head>
+<body>
+    <h1>Productos de la Máquina {{ maquina.nombre }}</h1>
+    <ul>
+        {% set actual_producto = maquina.lista_productos.primero %}
+        {% while actual_producto %}
+        <li>{{ actual_producto.producto.nombre }}</li>
+        {% set actual_producto = actual_producto.siguiente %}
+        {% endwhile %}
+    </ul>
+    <a href="/">Volver al inicio</a>
+</body>
+</html>
