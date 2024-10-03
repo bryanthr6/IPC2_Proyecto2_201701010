@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,49 +7,50 @@
 </head>
 <body>
     <h1>{{ data.content }}</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     
-    <!-- Formulario para cargar el archivo XML -->
-    <form method="POST" enctype="multipart/form-data">
-        <label for="archivo">Cargar archivo XML:</label>
-        <input type="file" name="archivo" id="archivo" accept=".xml" required>
+    <form method="post" action="/" enctype="multipart/form-data">
+        <label for="archivo">Subir archivo XML:</label>
+        <input type="file" name="archivo" id="archivo" accept=".xml">
         <button type="submit">Cargar</button>
     </form>
 
-    <!-- Mostrar mensajes flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <form method="post" action="/seleccionar-maquina">
+        <label for="maquina">Seleccionar Máquina:</label>
+        <select name="maquina" id="maquina" onchange="this.form.submit()">
+            <option value="">Seleccione una máquina</option>
+            {{ maquinas_html | safe }}
+        </select>
+    </form>
 
-    <!-- Combobox para seleccionar la máquina -->
-    {% if maquinas_html %}
-        <h2>Seleccionar máquina</h2>
-        <form method="POST" action="/seleccionar-maquina">
-            <label for="maquina">Máquinas disponibles:</label>
-            <select name="maquina" id="maquina" required>
-                <option value="" disabled selected>Seleccione una máquina</option>
-                {{ maquinas_html|safe }}
-            </select>
-            <button type="submit">Seleccionar</button>
-        </form>
+    <!-- Aquí mostrarás la información de la máquina seleccionada -->
+    {% if tiempo_ensamblaje is not none %}
+    <div>
+        <h2>Información de la Máquina</h2>
+        <p><strong>Tiempo de Ensamblaje:</strong> {{ tiempo_ensamblaje }}</p>
+        <p><strong>Número de Componentes:</strong> {{ componentes }}</p>
+        <p><strong>Número de Líneas de Ensamblaje:</strong> {{ lineas }}</p>
+    </div>
     {% endif %}
 
-    <!-- Combobox para seleccionar el producto si ya se seleccionó una máquina -->
-    {% if productos_html %}
-        <h2>Seleccionar producto</h2>
-        <form method="POST" action="/seleccionar-producto">
-            <label for="producto">Productos disponibles:</label>
-            <select name="producto" id="producto" required>
-                <option value="" disabled selected>Seleccione un producto</option>
-                {{ productos_html|safe }}
-            </select>
-            <button type="submit">Seleccionar</button>
-        </form>
-    {% endif %}
+    <form method="post" action="/seleccionar-producto">
+        <label for="producto">Seleccionar Producto:</label>
+        <select name="producto" id="producto">
+            <option value="">Seleccione un producto</option>
+            {{ productos_html | safe }}
+        </select>
+        <input type="hidden" name="maquina" value="{{ maquina_seleccionada }}">
+        <button type="submit">Seleccionar Producto</button>
+    </form>
 </body>
 </html>

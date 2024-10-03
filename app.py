@@ -24,7 +24,7 @@ def index():
     productos_html = ""  # String para almacenar los productos de una máquina seleccionada
 
     if request.method == 'POST':
-        archivo = request.files.get('archivo')
+        archivo = request.files.get('archivo')  # Obtenemos el archivo subido
         if archivo and archivo.filename.endswith('.xml'):
             try:
                 ruta_archivo = os.path.join('./uploads', archivo.filename)
@@ -52,11 +52,19 @@ def index():
 def seleccionar_maquina():
     maquina_seleccionada = request.form.get('maquina')
     productos_html = ""
+    tiempo_ensamblaje = None
+    componentes = None
+    lineas = None
 
     # Buscar la máquina seleccionada en la lista enlazada
     actual = lista_maquinas.primero
     while actual:
         if actual.maquina.nombre == maquina_seleccionada:
+            # Obtener información adicional de la máquina
+            tiempo_ensamblaje = actual.maquina.tiempo_ensamblaje
+            componentes = actual.maquina.componentes
+            lineas = actual.maquina.lineas
+            
             # Recorrer la lista de productos de la máquina seleccionada y generar las opciones HTML
             actual_producto = actual.maquina.lista_productos.primero
             while actual_producto:
@@ -67,7 +75,7 @@ def seleccionar_maquina():
 
     data = {
         'title': 'IPC2_Proyecto2_201701010',
-        'content': f'Productos disponibles para {maquina_seleccionada}'
+        'content': f'Productos disponibles para {maquina_seleccionada}',
     }
 
     # Volvemos a cargar las máquinas para seguir mostrando el combo box de máquinas
@@ -77,7 +85,37 @@ def seleccionar_maquina():
         maquinas_html += f'<option value="{actual.maquina.nombre}">{actual.maquina.nombre}</option>'
         actual = actual.siguiente
 
-    return render_template('index.html', data=data, maquinas_html=maquinas_html, productos_html=productos_html)
+    return render_template('index.html', data=data, maquinas_html=maquinas_html, productos_html=productos_html, 
+                           tiempo_ensamblaje=tiempo_ensamblaje, componentes=componentes, lineas=lineas)
+
+@app.route('/seleccionar-producto', methods=['POST'])
+def seleccionar_producto():
+    producto_seleccionado = request.form.get('producto')
+    maquina_seleccionada = request.form.get('maquina')
+
+    # Buscar la máquina seleccionada en la lista enlazada
+    actual = lista_maquinas.primero
+    lineas_produccion = None
+    while actual:
+        if actual.maquina.nombre == maquina_seleccionada:
+            lineas_produccion = actual.maquina.lineas
+            break
+        actual = actual.siguiente
+
+    # Redirigir a la página de resultados
+    return redirect(url_for('resultados', producto=producto_seleccionado, lineas=lineas_produccion))
+
+@app.route('/resultados')
+def resultados():
+    producto = request.args.get('producto')
+    lineas = request.args.get('lineas')
+
+    data = {
+        'title': 'Resultados de Selección',
+        'producto': producto,
+        'lineas': lineas
+    }
+    return render_template('resultados.html', data=data)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

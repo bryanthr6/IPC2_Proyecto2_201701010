@@ -1,4 +1,4 @@
-#cargar.py
+# cargar.py
 import xml.etree.ElementTree as ET
 import re
 from lista_maquinas import Lista_Maquinas
@@ -6,12 +6,8 @@ from lista_productos import Lista_Productos
 from maquina import Maquina
 from producto import Producto
 
-def cargar_archivo(ruta, lista_maquinas=None):
+def cargar_archivo(ruta, lista_maquinas):
     try:
-        # Si no hay una lista de máquinas existente, crear una nueva
-        if lista_maquinas is None:
-            lista_maquinas = Lista_Maquinas()
-
         tree = ET.parse(ruta)
         root = tree.getroot()
         
@@ -36,9 +32,11 @@ def cargar_archivo(ruta, lista_maquinas=None):
                 producto = Producto(nombre_producto, elaboracion_limpia)
                 lista_productos.insertar(producto)  # Insertar el producto en la lista enlazada
             
-            # Crear objeto Maquina con la lista enlazada de productos
-            maquina = Maquina(nombre, lineas, componentes, tiempo_ensamblaje, lista_productos)
-            lista_maquinas.insertar(maquina)
+            # Comprobar si la máquina ya existe en la lista
+            if not lista_maquinas.contiene(nombre):
+                # Crear objeto Maquina con la lista enlazada de productos
+                maquina = Maquina(nombre, lineas, componentes, tiempo_ensamblaje, lista_productos)
+                lista_maquinas.insertar(maquina)
         
         print("Archivo cargado y máquinas procesadas exitosamente.")
         return lista_maquinas
