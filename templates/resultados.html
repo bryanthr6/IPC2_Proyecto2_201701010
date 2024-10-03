@@ -34,5 +34,21 @@
 
     <p><strong>Tiempo total:</strong> {{ tiempo_total }} segundos</p>
 
+    <!-- Formulario para generar el resumen en XML -->
+    <h2>Generar resumen en XML</h2>
+    <form action="/generar-resumen" method="POST">
+        <label for="nombre_archivo">Nombre del archivo:</label>
+        <input type="text" id="nombre_archivo" name="nombre_archivo" required placeholder="ej: resumen.xml"><br>
+
+        <label for="ubicacion_archivo">Ubicación:</label>
+        <input type="text" id="ubicacion_archivo" name="ubicacion_archivo" required placeholder="ej: ./uploads"><br>
+
+        <input type="hidden" name="producto" value="{{ producto }}">
+        <input type="hidden" name="segundos_accion" value="{{ segundos_accion }}">
+        <input type="hidden" name="lineas" value="{{ lineas }}">
+        <input type="hidden" name="tiempo_total" value="{{ tiempo_total }}">
+
+        <button type="submit">Generar XML</button>
+    </form>
 </body>
 </html>

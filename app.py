@@ -3,6 +3,22 @@ import os
 from cargar import cargar_archivo
 from calcular_tiempo import calcular_tiempo_ensamblaje
 from lista_maquinas import Lista_Maquinas
+import xml.etree.ElementTree as ET
+
+
+def indent(elem, level=0):
+    """Indenta un árbol XML para que sea más legible."""
+    i = "\n" + level * "  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        for subelem in elem:
+            indent(subelem, level + 1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -140,6 +156,41 @@ def resultados():
         'lineas': lineas
     }
     return render_template('resultados.html', data=data)
+
+@app.route('/generar-resumen', methods=['POST'])
+def generar_resumen():
+    nombre_archivo = request.form['nombre_archivo']
+    ubicacion_archivo = request.form['ubicacion_archivo']
+    producto = request.form['producto']
+    segundos_accion = eval(request.form['segundos_accion'])
+    lineas = int(request.form['lineas'])
+    tiempo_total = int(request.form['tiempo_total'])
+
+    try:
+        root = ET.Element('ResumenEnsamblaje')
+        ET.SubElement(root, 'Producto').text = producto
+        ET.SubElement(root, 'TiempoTotal').text = str(tiempo_total)
+        historial_element = ET.SubElement(root, 'Historial')
+
+        for segundo in range(1, tiempo_total + 1):
+            segundo_element = ET.SubElement(historial_element, 'Segundo', numero=str(segundo))
+            for linea in range(1, lineas + 1):
+                if segundo in segundos_accion and linea in segundos_accion[segundo]:
+                    accion = segundos_accion[segundo][linea]
+                else:
+                    accion = "No hacer nada"
+                ET.SubElement(segundo_element, 'Linea', numero=str(linea)).text = accion
+
+        indent(root)  # Formatea el árbol XML
+        tree = ET.ElementTree(root)
+        ruta_completa = os.path.join(ubicacion_archivo, nombre_archivo)
+        tree.write(ruta_completa, encoding='utf-8', xml_declaration=True)
+
+        flash(f'Resumen XML generado y guardado en {ruta_completa}', 'success')
+    except Exception as e:
+        flash(f'Error al generar el resumen XML: {str(e)}', 'danger')
+
+    return redirect(url_for('resultados', producto=producto, lineas=lineas))
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
