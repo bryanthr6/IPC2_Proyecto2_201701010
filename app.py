@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 import os
 from cargar import cargar_archivo
+from calcular_tiempo import calcular_tiempo_ensamblaje
 from lista_maquinas import Lista_Maquinas
 
 app = Flask(__name__)
@@ -85,8 +86,10 @@ def seleccionar_maquina():
         maquinas_html += f'<option value="{actual.maquina.nombre}">{actual.maquina.nombre}</option>'
         actual = actual.siguiente
 
+    # Asegúrate de pasar maquina_seleccionada al template
     return render_template('index.html', data=data, maquinas_html=maquinas_html, productos_html=productos_html, 
-                           tiempo_ensamblaje=tiempo_ensamblaje, componentes=componentes, lineas=lineas)
+                           tiempo_ensamblaje=tiempo_ensamblaje, componentes=componentes, lineas=lineas, 
+                           maquina_seleccionada=maquina_seleccionada)
 
 @app.route('/seleccionar-producto', methods=['POST'])
 def seleccionar_producto():
@@ -95,15 +98,36 @@ def seleccionar_producto():
 
     # Buscar la máquina seleccionada en la lista enlazada
     actual = lista_maquinas.primero
-    lineas_produccion = None
+    maquina = None
     while actual:
         if actual.maquina.nombre == maquina_seleccionada:
-            lineas_produccion = actual.maquina.lineas
+            maquina = actual.maquina
             break
         actual = actual.siguiente
 
-    # Redirigir a la página de resultados
-    return redirect(url_for('resultados', producto=producto_seleccionado, lineas=lineas_produccion))
+    if maquina is None:
+        flash(f"Error: La máquina '{maquina_seleccionada}' no fue encontrada.", "danger")
+        return redirect(url_for('index'))
+
+    # Buscar el producto seleccionado en la lista de productos de la máquina
+    actual_producto = maquina.lista_productos.primero
+    producto = None
+    while actual_producto:
+        if actual_producto.producto.nombre == producto_seleccionado:
+            producto = actual_producto.producto
+            break
+        actual_producto = actual_producto.siguiente
+
+    if producto is None:
+        flash(f"Error: El producto '{producto_seleccionado}' no fue encontrado en la máquina '{maquina_seleccionada}'.", "danger")
+        return redirect(url_for('index'))
+
+    # Calcular el historial de ensamblaje
+    segundos_accion, tiempo_total = calcular_tiempo_ensamblaje(maquina, producto)
+
+    # Renderizar la plantilla de resultados con el historial y las acciones por segundo
+    return render_template('resultados.html', producto=producto.nombre, segundos_accion=segundos_accion, tiempo_total=tiempo_total, lineas=maquina.lineas)
+
 
 @app.route('/resultados')
 def resultados():
