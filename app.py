@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 import os
 from cargar import cargar_archivo
 from calcular_tiempo import calcular_tiempo_ensamblaje
+from grafica import generar_grafico_elaboracion  # Importa la función de generar gráfico
 from lista_maquinas import Lista_Maquinas
 import xml.etree.ElementTree as ET
 
@@ -191,6 +192,7 @@ def generar_resumen():
         flash(f'Error al generar el resumen XML: {str(e)}', 'danger')
 
     return redirect(url_for('resultados', producto=producto, lineas=lineas))
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

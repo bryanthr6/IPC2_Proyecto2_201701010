@@ -4,13 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ data.title }}</title>
+    <style>
+        body {
+            background-color: #00006a;
+            color: #ffffff;
+            text-align: center; /* Centra el título principal */
+        }
+
+        section {
+            margin: 20px auto; /* Espacio vertical entre secciones */
+            text-align: left; /* Alinea el texto a la izquierda */
+            display: inline-block; /* Permite que cada sección se ajuste a su contenido */
+            background-color: #2a2a72; /* Color de fondo para todas las secciones */
+            padding: 15px; /* Añade espacio interno */
+            border-radius: 8px; /* Bordes redondeados */
+        }
+
+        h1 {
+            margin-top: 50px; /* Añade algo de espacio arriba */
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        /* Alineación de los formularios */
+        form > label, input[type="file"], select, button {
+            display: block; /* Asegura que los elementos del formulario ocupen toda la línea */
+            margin: 5px 0; /* Espacio entre los elementos */
+        }
+    </style>
 </head>
 <body>
     <h1>{{ data.content }}</h1>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <ul>
+            <ul style="list-style-type: none;">
             {% for message in messages %}
                 <li>{{ message }}</li>
             {% endfor %}
@@ -18,39 +48,56 @@
         {% endif %}
     {% endwith %}
 
-    
-    <form method="post" action="/" enctype="multipart/form-data">
-        <label for="archivo">Subir archivo XML:</label>
-        <input type="file" name="archivo" id="archivo" accept=".xml">
-        <button type="submit">Cargar</button>
-    </form>
+    <br><br>
 
-    <form method="post" action="/seleccionar-maquina">
-        <label for="maquina">Seleccionar Máquina:</label>
-        <select name="maquina" id="maquina" onchange="this.form.submit()">
-            <option value="">Seleccione una máquina</option>
-            {{ maquinas_html | safe }}
-        </select>
-    </form>
+    <section>
+        <h2>Cargar Archivo XML</h2>
+        <form method="post" action="/" enctype="multipart/form-data">
+            <label for="archivo">Subir archivo XML:</label>
+            <input type="file" name="archivo" id="archivo" accept=".xml">
+            <button type="submit" class="btn btn-success">Cargar</button>
+        </form>
+    </section>
 
-    <!-- Aquí mostrarás la información de la máquina seleccionada -->
+    <br><br>
+
+    <section>
+        <h2>Seleccionar Máquina</h2>
+        <form method="post" action="/seleccionar-maquina">
+            <label for="maquina">Máquinas disponibles:</label>
+            <select name="maquina" id="maquina" onchange="this.form.submit()">
+                <option value="">Seleccione una máquina</option>
+                {{ maquinas_html | safe }}
+            </select>
+        </form>
+    </section>
+
+    <br><br>
+
     {% if tiempo_ensamblaje is not none %}
-    <div>
-        <h2>Información de la Máquina</h2>
-        <p><strong>Tiempo de Ensamblaje:</strong> {{ tiempo_ensamblaje }}</p>
+    <section>
+        <h2>Información de la Máquina Seleccionada</h2>
+        <p><strong>Tiempo de Ensamblaje:</strong> {{ tiempo_ensamblaje }} segundos</p>
         <p><strong>Número de Componentes:</strong> {{ componentes }}</p>
         <p><strong>Número de Líneas de Ensamblaje:</strong> {{ lineas }}</p>
-    </div>
+    </section>
     {% endif %}
 
-    <form method="post" action="/seleccionar-producto">
-        <label for="producto">Seleccionar Producto:</label>
-        <select name="producto" id="producto">
-            <option value="">Seleccione un producto</option>
-            {{ productos_html | safe }}
-        </select>
-        <input type="hidden" name="maquina" value="{{ maquina_seleccionada }}">
-        <button type="submit">Seleccionar Producto</button>
-    </form>
+    <br><br>
+
+    <section>
+        <h2>Seleccionar Producto</h2>
+        <form method="post" action="/seleccionar-producto">
+            <label for="producto">Productos disponibles:</label>
+            <select name="producto" id="producto">
+                <option value="">Seleccione un producto</option>
+                {{ productos_html | safe }}
+            </select>
+            <input type="hidden" name="maquina" value="{{ maquina_seleccionada }}">
+            <button type="submit" class="btn btn-success">Seleccionar Producto</button>
+        </form>
+    </section>
+
+    <br><br>
 </body>
 </html>

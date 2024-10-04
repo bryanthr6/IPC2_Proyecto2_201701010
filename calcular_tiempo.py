@@ -1,14 +1,15 @@
 # calcular_tiempo.py
-import re  # Usaremos expresiones regulares
-from lista_posicion import Lista_Posicion  # Importar la clase para las posiciones
-from lista_historial import Lista_Historial  # Importar la lista enlazada para el historial
+import re
+from lista_posicion import Lista_Posicion
+from lista_historial import Lista_Historial
+from segundos_accion import Lista_SegundosAccion
 
 def calcular_tiempo_ensamblaje(maquina, producto):
-    instrucciones = producto.elaboracion.split()  # Asumiendo que las instrucciones están separadas por espacios
+    instrucciones = producto.elaboracion.split()
     tiempo_total = 0
-    posiciones = Lista_Posicion()  # Crear la lista enlazada para las posiciones de los brazos
-    historial = Lista_Historial()  # Usar la lista enlazada para almacenar los movimientos y ensamblajes
-    segundos_accion = {}  # Guardar acciones por segundo y línea de producción (clave: segundo)
+    posiciones = Lista_Posicion()
+    historial = Lista_Historial()
+    segundos_accion = Lista_SegundosAccion()
 
     for instruccion in instrucciones:
         match = re.match(r'L(\d+)C(\d+)', instruccion)
@@ -16,28 +17,20 @@ def calcular_tiempo_ensamblaje(maquina, producto):
             historial.insertar(f"ERROR: Instrucción no válida '{instruccion}'")
             continue
 
-        linea = int(match.group(1))  # Obtener el número de línea
-        componente = int(match.group(2))  # Obtener el número de componente
+        linea = int(match.group(1))
+        componente = int(match.group(2))
         posicion_anterior = posiciones.obtener_posicion(linea)
         tiempo_mover_brazo = abs(componente - posicion_anterior)
         tiempo_ensamblar = maquina.tiempo_ensamblaje
 
-        # Actualizar la posición del brazo
         posiciones.insertar_o_actualizar(linea, componente)
 
-        # Almacenar el movimiento del brazo
         for segundo in range(tiempo_total + 1, tiempo_total + 1 + tiempo_mover_brazo):
-            if segundo not in segundos_accion:
-                segundos_accion[segundo] = {}
-            segundos_accion[segundo][linea] = f"Mover brazo a componente {componente} (tarda {tiempo_mover_brazo} segundos)"
+            segundos_accion.insertar(segundo, linea, f"Mover brazo a componente {componente} (tarda {tiempo_mover_brazo} segundos)")
         tiempo_total += tiempo_mover_brazo
 
-        # Almacenar el ensamblaje
         for segundo in range(tiempo_total + 1, tiempo_total + 1 + tiempo_ensamblar):
-            if segundo not in segundos_accion:
-                segundos_accion[segundo] = {}
-            segundos_accion[segundo][linea] = f"Ensamblar componente {componente} (tarda {tiempo_ensamblar} segundos)"
+            segundos_accion.insertar(segundo, linea, f"Ensamblar componente {componente} (tarda {tiempo_ensamblar} segundos)")
         tiempo_total += tiempo_ensamblar
 
-    # Retornar el historial de acciones por segundo
-    return segundos_accion, tiempo_total
+    return segundos_accion.obtener_acciones(), tiempo_total
