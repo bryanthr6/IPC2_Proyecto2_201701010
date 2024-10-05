@@ -1,27 +1,39 @@
-# lista_acciones.py
-from nodo_accion import Nodo_Accion
+from nodo_accion import NodoAccion
 
-class Lista_Acciones:
+class ListaAcciones:
     def __init__(self):
-        self.primero = None  # Primer nodo de la lista enlazada
+        self.primero = None
 
-    def insertar(self, accion):
-        # Crear un nuevo nodo de acción
-        nuevo_nodo = Nodo_Accion(accion)
+    def agregar_accion(self, segundo, linea, accion):
+        """ Agrega o actualiza la acción de una línea en un segundo específico """
+        nodo_actual = self.primero
+        nodo_anterior = None
 
-        # Si la lista está vacía, el nuevo nodo es el primero
-        if self.primero is None:
+        # Buscar si ya existe un nodo para el segundo
+        while nodo_actual is not None:
+            if nodo_actual.segundo == segundo:
+                # Actualizar la acción para la línea
+                nodo_actual.acciones[linea] = accion
+                return
+            nodo_anterior = nodo_actual
+            nodo_actual = nodo_actual.siguiente
+
+        # Si no se encontró un nodo para el segundo, creamos uno nuevo
+        nuevo_nodo = NodoAccion(segundo, {linea: accion})
+
+        if nodo_anterior is None:
+            # Insertar como primer nodo si la lista está vacía
             self.primero = nuevo_nodo
         else:
-            # Recorrer hasta el final de la lista para insertar el nuevo nodo
-            actual = self.primero
-            while actual.siguiente:
-                actual = actual.siguiente
-            actual.siguiente = nuevo_nodo
+            # Añadir al final de la lista
+            nodo_anterior.siguiente = nuevo_nodo
 
-    def recorrer(self):
-        # Recorre la lista y devuelve las acciones en orden
-        actual = self.primero
-        while actual:
-            yield actual.accion
-            actual = actual.siguiente
+    def obtener_acciones(self, segundo):
+        """ Devuelve un diccionario con las acciones para un segundo específico, si existen """
+        nodo_actual = self.primero
+        while nodo_actual is not None:
+            if nodo_actual.segundo == segundo:
+                return nodo_actual.acciones  # Debería ser un objeto donde puedas buscar por línea
+            nodo_actual = nodo_actual.siguiente
+        return None  # Si no se encontraron acciones para ese segundo
+

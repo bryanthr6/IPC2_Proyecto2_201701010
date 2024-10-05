@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados de Ensamblaje</title>
     <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-mrA0rjrmAnTIIHGoy1K9yMf5xE7Ek4C4ySAwFZfS/tzbzawDs6YcYZ4t7jci7tju" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #00006a; /* Color de fondo */
@@ -13,23 +13,24 @@
         }
 
         table {
-            width: 100%; /* Hace que la tabla ocupe todo el ancho disponible */
-            margin: 20px 0; /* Añade margen vertical */
-            border-collapse: collapse; /* Colapsa los bordes de la tabla */
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
         }
 
         th, td {
-            border: 1px solid #ffffff; /* Borde blanco para las celdas */
-            padding: 10px; /* Espacio interno en las celdas */
-            text-align: center; /* Centra el contenido en las celdas */
+            border: 1px solid #ffffff;
+            padding: 10px;
+            text-align: center;
+            color: #ffffff;
         }
 
         th {
-            background-color: #0000a3; /* Fondo de los encabezados de tabla */
+            background-color: #0000a3;
         }
 
         tbody tr:nth-child(even) {
-            background-color: #333; /* Color de fondo para filas pares */
+            background-color: #333;
         }
     </style>
 </head>
@@ -37,6 +38,9 @@
     <h1>Resultados del Ensamblaje</h1>
 
     <h2>Producto: {{ producto }}</h2>
+
+    <!-- Mostrar la secuencia de elaboración -->
+    <h3>Elaboración: {{ elaboracion }}</h3>
 
     <h3>Historial de ensamblaje</h3>
     <table class="table table-bordered table-hover">
@@ -50,19 +54,21 @@
         </thead>
         <tbody>
             {% for segundo in range(1, tiempo_total + 1) %}
-            <tr>
-                <td>{{ segundo }}</td>
-                {% for linea in range(1, lineas + 1) %}
-                    <td>
-                        {% if segundos_accion[segundo] is defined and linea in segundos_accion[segundo] %}
-                            {{ segundos_accion[segundo][linea] }}
-                        {% else %}
-                            No hacer nada
-                        {% endif %}
-                    </td>
-                {% endfor %}
-            </tr>
+                <tr>
+                    <td>{{ segundo }}</td>
+                    {% for linea in range(1, lineas + 1) %}
+                        <td>
+                            {% set acciones = segundos_accion.obtener_acciones(segundo) %}
+                            {% if acciones and linea in acciones %}
+                                {{ acciones[linea] }}
+                            {% else %}
+                                No hacer nada
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
             {% endfor %}
+
         </tbody>
     </table>
 
@@ -72,30 +78,31 @@
     <form action="/generar-resumen" method="POST">
         <label for="nombre_archivo">Nombre del archivo:</label>
         <input type="text" id="nombre_archivo" name="nombre_archivo" required placeholder="ej: resumen.xml" class="form-control"><br>
-
+    
         <label for="ubicacion_archivo">Ubicación:</label>
         <input type="text" id="ubicacion_archivo" name="ubicacion_archivo" required placeholder="ej: ./uploads" class="form-control"><br>
-
+    
         <input type="hidden" name="producto" value="{{ producto }}">
-        <input type="hidden" name="segundos_accion" value="{{ segundos_accion }}">
-        <input type="hidden" name="lineas" value="{{ lineas }}">
         <input type="hidden" name="tiempo_total" value="{{ tiempo_total }}">
-
+        
+    
         <button type="submit" class="btn btn-success">Generar XML</button>
     </form>
 
     <h2>Generar gráfico de ensamblaje</h2>
     <form action="/generar-grafico" method="POST">
         <label for="nombre_archivo">Nombre del archivo del gráfico:</label>
-        <input type="text" id="nombre_archivo" name="nombre_archivo" required placeholder="ej: grafico.png"><br>
+        <input type="text" id="nombre_archivo" name="nombre_archivo" required placeholder="ej: grafico" class="form-control"><br>
 
         <label for="ubicacion_archivo">Ubicación de guardado:</label>
-        <input type="text" id="ubicacion_archivo" name="ubicacion_archivo" required placeholder="ej: ./uploads"><br>
+        <input type="text" id="ubicacion_archivo" name="ubicacion_archivo" required placeholder="ej: ./uploads" class="form-control"><br>
 
         <input type="hidden" name="producto" value="{{ producto }}">
-        <input type="hidden" name="elaboracion" value="{{ segundos_accion_elaboracion }}">  <!-- Cadena de elaboración -->
+        <input type="hidden" name="elaboracion" value="{{ elaboracion }}">
+        <input type="hidden" name="maquina" value="{{ lineas }}">  <!-- Cambia esto si necesitas pasar el nombre de la máquina -->
 
-        <button type="submit">Generar gráfico</button>
-</form>
+        <button type="submit" class="btn btn-success">Generar gráfico</button>
+    </form>
+
 </body>
 </html>

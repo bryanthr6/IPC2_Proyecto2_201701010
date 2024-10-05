@@ -1,18 +1,9 @@
-#lista_maquinas.py
 from nodo_maquina import Nodo_Maquina
 from maquina import Maquina
 
 class Lista_Maquinas:
     def __init__(self):
         self.primero = None
-
-    def contiene(self, nombre_maquina):
-        actual = self.primero
-        while actual:
-            if actual.maquina.nombre == nombre_maquina:
-                return True
-            actual = actual.siguiente
-        return False
 
     def insertar(self, maquina):
         if not self.primero:

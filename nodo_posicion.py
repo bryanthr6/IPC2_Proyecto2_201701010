@@ -1,4 +1,3 @@
-#nodo_posicion.py
 class Nodo_Posicion:
     def __init__(self, linea, posicion):
         self.linea = linea  # Número de la línea de ensamblaje

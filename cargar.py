@@ -5,8 +5,13 @@ from lista_maquinas import Lista_Maquinas
 from lista_productos import Lista_Productos
 from maquina import Maquina
 from producto import Producto
+from lista_productos_acumulados import Lista_Productos_Acumulados
 
-def cargar_archivo(ruta, lista_maquinas):
+# Crear instancias globales para acumular máquinas y productos
+lista_maquinas_acumuladas = Lista_Maquinas()
+lista_productos_acumulados = Lista_Productos_Acumulados()
+
+def cargar_archivo(ruta):
     try:
         tree = ET.parse(ruta)
         root = tree.getroot()
@@ -31,15 +36,15 @@ def cargar_archivo(ruta, lista_maquinas):
                 
                 producto = Producto(nombre_producto, elaboracion_limpia)
                 lista_productos.insertar(producto)  # Insertar el producto en la lista enlazada
+                
+                # Insertar cada producto en la lista global acumulada
+                lista_productos_acumulados.insertar(producto)
             
-            # Comprobar si la máquina ya existe en la lista
-            if not lista_maquinas.contiene(nombre):
-                # Crear objeto Maquina con la lista enlazada de productos
-                maquina = Maquina(nombre, lineas, componentes, tiempo_ensamblaje, lista_productos)
-                lista_maquinas.insertar(maquina)
+            # Crear objeto Maquina con la lista enlazada de productos
+            maquina = Maquina(nombre, lineas, componentes, tiempo_ensamblaje, lista_productos)
+            lista_maquinas_acumuladas.insertar(maquina)
         
         print("Archivo cargado y máquinas procesadas exitosamente.")
-        return lista_maquinas
     
     except FileNotFoundError:
         print(f"ERROR: El archivo '{ruta}' no se encontró.")

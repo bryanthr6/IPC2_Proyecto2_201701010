@@ -1,32 +1,29 @@
-# lista_segundos_accion.py
-from nodo_segundo_accion import Nodo_SegundoAccion
+from nodo_segundos_accion import NodoSegundoAccion
 
-class Lista_SegundosAccion:
+class ListaSegundosAccion:
     def __init__(self):
-        self.primero = None
+        self.primero = None  # Nodo inicial de la lista
 
-    def insertar(self, segundo, linea, accion):
-        nuevo_nodo = Nodo_SegundoAccion(segundo, linea, accion)
-        if self.primero is None:
-            self.primero = nuevo_nodo
+    def agregar_segundo(self, segundo, linea, accion):
+        # Si la lista está vacía, agregamos el primer nodo
+        if not self.primero:
+            self.primero = NodoSegundoAccion(segundo, linea, accion)
         else:
             actual = self.primero
-            # Insertar al final de la lista
-            while actual.siguiente:
+            # Buscamos el segundo si ya existe
+            while actual:
+                if actual.segundo == segundo:
+                    actual.agregar_accion(linea, accion)
+                    return
+                if not actual.siguiente:  # Si llegamos al final, lo añadimos
+                    break
                 actual = actual.siguiente
-            actual.siguiente = nuevo_nodo
+            actual.siguiente = NodoSegundoAccion(segundo, linea, accion)
 
-    def obtener_acciones_por_segundo(self, segundo):
+    def obtener_acciones(self, segundo):
         actual = self.primero
-        acciones = []
         while actual:
             if actual.segundo == segundo:
-                acciones.append((actual.linea, actual.accion))
+                return actual.acciones
             actual = actual.siguiente
-        return acciones  # Retornar todas las acciones para ese segundo
-
-    def imprimir(self):
-        actual = self.primero
-        while actual:
-            print(f"Segundo: {actual.segundo}, Línea: {actual.linea}, Acción: {actual.accion}")
-            actual = actual.siguiente
+        return None  # No se encontró el segundo

@@ -1,5 +1,5 @@
-# nodo_accion.py
-class Nodo_Accion:
-    def __init__(self, accion=None):
-        self.accion = accion  # El texto de la acción
-        self.siguiente = None  # Puntero al siguiente nodo
+class NodoAccion:
+    def __init__(self, segundo, acciones):
+        self.segundo = segundo
+        self.acciones = acciones  # Este es el diccionario de acciones por línea
+        self.siguiente = None

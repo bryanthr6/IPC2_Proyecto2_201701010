@@ -1,4 +1,4 @@
-#maquina.py
+
 from lista_productos import Lista_Productos
 
 class Maquina:
