@@ -7,6 +7,13 @@ from maquina import Maquina
 from producto import Producto
 from lista_productos_acumulados import Lista_Productos_Acumulados
 
+def inicializar_datos():
+    global lista_maquinas_acumuladas, lista_productos_acumulados
+    lista_maquinas_acumuladas = Lista_Maquinas()  # Reiniciar lista de máquinas acumuladas
+    lista_productos_acumulados = Lista_Productos_Acumulados()  # Reiniciar lista de productos acumulados
+    print("Datos inicializados. El entorno está listo para cargar un archivo nuevo.")
+
+
 # Crear instancias globales para acumular máquinas y productos
 lista_maquinas_acumuladas = Lista_Maquinas()
 lista_productos_acumulados = Lista_Productos_Acumulados()
